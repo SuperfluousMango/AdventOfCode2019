@@ -1,0 +1,26 @@
+{
+  "name": "adventofcode2019",
+  "version": "1.0.0",
+  "description": "Advent of Code 2018",
+  "main": "index.ts",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/SuperfluousMango/AdventOfCode2019.git"
+  },
+  "author": "SuperfluousMango",
+  "license": "UNLICENSED",
+  "bugs": {
+    "url": "https://github.com/SuperfluousMango/AdventOfCode2019/issues"
+  },
+  "homepage": "https://github.com/SuperfluousMango/AdventOfCode2019#readme",
+  "devDependencies": {
+    "ts-node": "^8.5.4",
+    "typescript": "^3.7.3"
+  },
+  "dependencies": {
+    "@types/node": "^12.12.14"
+  }
+}
