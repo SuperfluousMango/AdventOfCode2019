@@ -6,17 +6,20 @@ console.log(`Puzzle B solution: ${puzzleB()}`);
 
 function puzzleA() {
     const program = splitInput(inputData);
-    // const program = splitInput('1002,4,3,4,33');
 
     const processor = new IntcodeProcessor(program);
-    processor.inputVal = 1;
+    processor.inputVal = 1; // specified by instructions
     processor.runProgram();
     return processor.outputVal;
 }
 
 function puzzleB() {
     const program = splitInput(inputData);
+
     const processor = new IntcodeProcessor(program);
+    processor.inputVal = 5; // specified by instructions
+    processor.runProgram();
+    return processor.outputVal;
 }
 
 function splitInput(inputData: string) {
