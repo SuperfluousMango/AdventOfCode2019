@@ -1,6 +1,6 @@
 import { inputData } from "./data";
 import { IntcodeProcessor } from "../util/intcode-processor";
-import { permutation, combination } from "js-combinatorics";
+import { permutation } from "js-combinatorics";
 
 console.log(`Puzzle A solution: ${puzzleA()}`);
 console.log(`Puzzle B solution: ${puzzleB()}`);
