@@ -21,6 +21,8 @@
     "typescript": "^3.7.3"
   },
   "dependencies": {
-    "@types/node": "^12.12.14"
+    "@types/js-combinatorics": "^0.5.31",
+    "@types/node": "^12.12.14",
+    "js-combinatorics": "^0.5.4"
   }
 }

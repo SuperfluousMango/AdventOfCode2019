@@ -8,6 +8,7 @@
         "allowJs": true,
         "noEmit": true,
         "alwaysStrict": true,
+        "sourceMap": true,
         "lib": [
             "esnext",
             "dom"

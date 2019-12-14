@@ -27,7 +27,7 @@ export class IntcodeProcessor {
 
     runProgram() {
         if (this.debugMode) { console.log(this.program.join(',')); }
-        this.instructionPtr = 0;
+        if (this.debugMode) { console.log(`${this.instructionPtr === 0 ? 'Starting' : 'Resuming'} program at position ${this.instructionPtr}`); }
 
         do {
             const baseOpCode = this.program[this.instructionPtr],
@@ -47,16 +47,19 @@ export class IntcodeProcessor {
                     if (this.debugMode) { console.log('MUL param vals', this.getParamValue(op.params[0]), this.getParamValue(op.params[1])); }
                     this.program[pos] = this.getParamValue(op.params[0]) * this.getParamValue(op.params[1]);
                     break;
-                case OpCode.PUT:
+                case OpCode.WRI:
                     pos = op.params[0].value;
                     if (this.inputVal === null) {
-                        throw new Error(`Attempt to write input when input not set at pos ${this.instructionPtr}`);
+                        if (this.debugMode) { console.log(`WRI input is null at pos ${this.instructionPtr}, pausing`); }
+                        // Input is not set, so stop the program here until they set an input and try again
+                        return;
                     }
-                    if (this.debugMode) { console.log(`PUT input ${this.inputVal} to pos ${pos}`); }
+                    if (this.debugMode) { console.log(`WRI input ${this.inputVal} to pos ${pos}`); }
                     this.program[pos] = this.inputVal;
+                    this.inputVal = null;
                     break;
-                case OpCode.GET:
-                    if (this.debugMode) { console.log('GET param vals', this.getParamValue(op.params[0])); }
+                case OpCode.OUT:
+                    if (this.debugMode) { console.log('OUT param val', this.getParamValue(op.params[0])); }
                     this.outputVal = this.getParamValue(op.params[0]);
                     break;
                 case OpCode.JIT:
@@ -136,8 +139,8 @@ export class IntcodeProcessor {
                 paramCount = 2;
                 break;
             // 1 parameter
-            case OpCode.PUT:
-            case OpCode.GET:
+            case OpCode.WRI:
+            case OpCode.OUT:
                 paramCount = 1;
                 break;
             // 0 parameters
@@ -171,8 +174,8 @@ interface Parameter {
 enum OpCode {
     ADD = 1,
     MUL = 2,
-    PUT = 3,
-    GET = 4,
+    WRI = 3,
+    OUT = 4,
     JIT = 5,
     JIF = 6,
     LT = 7,
