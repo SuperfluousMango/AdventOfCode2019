@@ -1,9 +1,11 @@
 export class IntcodeProcessor {
     private readonly origProgram: number[];
     private instructionPtr = 0;
+    private relativeBase = 0;
 
     inputVal: number | null = null;
     outputVal: number | null = null;
+    outputHandler: (output: number) => void;
 
     debugMode = false;
 
@@ -32,72 +34,72 @@ export class IntcodeProcessor {
         do {
             const baseOpCode = this.program[this.instructionPtr],
                 op = this.buildOperation(baseOpCode);
-
-            if (this.debugMode) { console.log(op); }
-            let pos: number;
+            let newVal: number;
 
             switch (op.opCode) {
                 case OpCode.ADD:
-                    pos = op.params[2].value;
-                    if (this.debugMode) { console.log('ADD param vals', this.getParamValue(op.params[0]), this.getParamValue(op.params[1])); }
-                    this.program[pos] = this.getParamValue(op.params[0]) + this.getParamValue(op.params[1]);
+                    if (this.debugMode) { console.log('ADD param vals', this.getParamValue(op.params[0]), this.getParamValue(op.params[1]), this.getParamValue(op.params[2], true)); }
+                    newVal = this.getParamValue(op.params[0]) + this.getParamValue(op.params[1]);
+                    this.writeValToPos(newVal, op.params[2]);
                     break;
                 case OpCode.MUL:
-                    pos = op.params[2].value;
-                    if (this.debugMode) { console.log('MUL param vals', this.getParamValue(op.params[0]), this.getParamValue(op.params[1])); }
-                    this.program[pos] = this.getParamValue(op.params[0]) * this.getParamValue(op.params[1]);
+                    if (this.debugMode) { console.log('MUL param vals', this.getParamValue(op.params[0]), this.getParamValue(op.params[1]), this.getParamValue(op.params[2], true)); }
+                    newVal = this.getParamValue(op.params[0]) * this.getParamValue(op.params[1]);
+                    this.writeValToPos(newVal, op.params[2]);
                     break;
-                case OpCode.WRI:
-                    pos = op.params[0].value;
+                case OpCode.IN:
                     if (this.inputVal === null) {
                         if (this.debugMode) { console.log(`WRI input is null at pos ${this.instructionPtr}, pausing`); }
                         // Input is not set, so stop the program here until they set an input and try again
                         return;
                     }
-                    if (this.debugMode) { console.log(`WRI input ${this.inputVal} to pos ${pos}`); }
-                    this.program[pos] = this.inputVal;
+                    this.writeValToPos(this.inputVal, op.params[0]);
                     this.inputVal = null;
                     break;
                 case OpCode.OUT:
                     if (this.debugMode) { console.log('OUT param val', this.getParamValue(op.params[0])); }
                     this.outputVal = this.getParamValue(op.params[0]);
+                    if (this.outputHandler) {
+                        this.outputHandler(this.outputVal);
+                    }
                     break;
                 case OpCode.JIT:
-                    pos = this.getParamValue(op.params[1]);
                     if (this.debugMode) { console.log('JIT param vals', this.getParamValue(op.params[0]), this.getParamValue(op.params[1])); }
                     if (this.getParamValue(op.params[0]) !== 0) {
-                        if (this.debugMode) { console.log(`JITing to position ${pos}`); }
-                        this.instructionPtr = pos;
+                        this.moveInstructionPointer(this.getParamValue(op.params[1]), false);
                         continue; // don't do normal instruction pointer movement
                     }
                     break;
                 case OpCode.JIF:
-                    pos = this.getParamValue(op.params[1]);
                     if (this.debugMode) { console.log('JIF param vals', this.getParamValue(op.params[0]), this.getParamValue(op.params[1])); }
                     if (this.getParamValue(op.params[0]) === 0) {
-                        if (this.debugMode) { console.log(`JIFing to position ${pos}`); }
-                        this.instructionPtr = pos;
-                        continue; // don't do normal instruction pointer movement;
+                        this.moveInstructionPointer(this.getParamValue(op.params[1]), false);
+                        continue; // don't do normal instruction pointer movement
                     }
                     break;
                 case OpCode.LT:
-                    pos = op.params[2].value;
-                    if (this.debugMode) { console.log('LT param vals', this.getParamValue(op.params[0]), this.getParamValue(op.params[1])); }
-                    this.program[pos] = this.getParamValue(op.params[0]) < this.getParamValue(op.params[1]) ? 1 : 0;
+                    if (this.debugMode) { console.log('LT param vals', this.getParamValue(op.params[0]), this.getParamValue(op.params[1]), this.getParamValue(op.params[2], true)); }
+                    newVal = this.getParamValue(op.params[0]) < this.getParamValue(op.params[1]) ? 1 : 0
+                    this.writeValToPos(newVal, op.params[2]);
                     break;
                 case OpCode.EQ:
-                    pos = op.params[2].value;
-                    if (this.debugMode) { console.log('EQ param vals', this.getParamValue(op.params[0]), this.getParamValue(op.params[1])); }
-                    this.program[pos] = this.getParamValue(op.params[0]) == this.getParamValue(op.params[1]) ? 1 : 0;
+                    if (this.debugMode) { console.log('EQ param vals', this.getParamValue(op.params[0]), this.getParamValue(op.params[1]), this.getParamValue(op.params[2], true)); }
+                    newVal = this.getParamValue(op.params[0]) === this.getParamValue(op.params[1]) ? 1 : 0;
+                    this.writeValToPos(newVal, op.params[2]);
+                    break;
+                case OpCode.REL:
+                    if (this.debugMode) { console.log('REL param val', this.getParamValue(op.params[0])); }
+                    this.relativeBase += this.getParamValue(op.params[0]);
+                    if (this.debugMode) { console.log(`New relative base: ${this.relativeBase}`); }
                     break;
                 case OpCode.END:
                     if (this.debugMode) { console.log('ENDing'); }
                     return this.program[0];
                 default:
-                    throw new Error(`Unexpected opcode ${op.opCode} encountered at pos ${this.instructionPtr}`);
+                    throw new Error(`Unexpected opcode ${op.opCode} encountered at instruction pointer ${this.instructionPtr}`);
             }
 
-            this.instructionPtr += op.params.length + 1; // number of parameters, plus one for the opcode
+            this.moveInstructionPointer(op.params.length + 1, true); // number of parameters, plus one for the opcode
         } while (this.instructionPtr <= this.program.length);
 
         throw new Error(`Unexpected EOF in program (instruction pointer ${this.instructionPtr}, program length ${this.program.length})`);
@@ -139,8 +141,9 @@ export class IntcodeProcessor {
                 paramCount = 2;
                 break;
             // 1 parameter
-            case OpCode.WRI:
+            case OpCode.IN:
             case OpCode.OUT:
+            case OpCode.REL:
                 paramCount = 1;
                 break;
             // 0 parameters
@@ -154,10 +157,39 @@ export class IntcodeProcessor {
         return this.program.slice(this.instructionPtr + 1, this.instructionPtr + 1 + paramCount);
     }
 
-    private getParamValue(param: Parameter): number {
-        return param.mode === ParameterMode.Position
-            ? this.program[param.value]
-            : param.value;
+    private getParamValue(param: Parameter, asWriteTarget = false): number {
+        let pos;
+        switch (param.mode) {
+            case ParameterMode.Position:
+            case ParameterMode.Immediate:
+                pos = param.value;
+                break;
+            case ParameterMode.Relative:
+                pos = param.value + this.relativeBase;
+                break;
+            default:
+                throw new Error(`Unexpected parameter mode at instruction pointer ${this.instructionPtr}, param ${param.mode}/${param.value}`);
+        }
+
+        if (asWriteTarget || param.mode === ParameterMode.Immediate) {
+            return pos;
+        } else {
+            if (pos < 0) {
+                throw new Error(`Unexpected negative memory position at instruction pointer ${this.instructionPtr}, param ${param.mode}/${param.value}`);
+            }
+            return this.program[pos] || 0; // Uninitialized values default to zero
+        }
+    }
+
+    private writeValToPos(val: number, posParam: Parameter) {
+        const pos = this.getParamValue(posParam, true);
+        if (this.debugMode) { console.log(`Writing ${val} to ${pos}`); }
+        this.program[pos] = val;
+    }
+
+    private moveInstructionPointer(val: number, relative: boolean) {
+        this.instructionPtr = relative ? this.instructionPtr + val : val;
+        if (this.debugMode) { console.log(`${relative ? 'Incrementing' : 'Jumping'} instruction pointer to ${this.instructionPtr}`); }
     }
 }
 
@@ -174,16 +206,18 @@ interface Parameter {
 enum OpCode {
     ADD = 1,
     MUL = 2,
-    WRI = 3,
+    IN = 3,
     OUT = 4,
     JIT = 5,
     JIF = 6,
     LT = 7,
     EQ = 8,
+    REL = 9,
     END = 99
 }
 
 enum ParameterMode {
     Position = 0,
-    Immediate = 1
+    Immediate = 1,
+    Relative = 2
 }
