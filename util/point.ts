@@ -1,6 +1,13 @@
 export class Point {
     constructor(readonly x: number, readonly y: number) { }
 
+    static fromPointString(pointString: string) {
+        const [x, y] = pointString.replace(/[()]/g, '')
+            .split(',')
+            .map(coord => Number(coord));
+        return new Point(x, y);
+    }
+
     toString() {
         return `(${this.x},${this.y})`;
     }
@@ -29,5 +36,14 @@ export class Point {
 
     calcManhattanDistanceToPoint(otherPoint: Point) {
         return Math.abs(this.x - otherPoint.x) + Math.abs(this.y - otherPoint.y);
+    }
+
+    getNeighborCoords() {
+        return [
+            new Point(this.x, this.y - 1),
+            new Point(this.x, this.y + 1),
+            new Point(this.x - 1, this.y),
+            new Point(this.x + 1, this.y)
+        ];
     }
 }
