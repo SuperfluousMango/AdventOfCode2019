@@ -1,14 +1,6 @@
 import { inputData } from "./data";
 import { IntcodeProcessor } from "../util/intcode-processor";
-import { Point } from "../util/point";
-
-enum TileId {
-    Empty = 0,
-    Wall = 1,
-    Block = 2,
-    Paddle = 3,
-    Ball = 4
-}
+import { TileId } from "./tile-id";
 
 console.log(`Puzzle A solution: ${puzzleA()}`);
 console.log(`Puzzle B solution: ${puzzleB()}`);
