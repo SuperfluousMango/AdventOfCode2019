@@ -22,7 +22,9 @@
   },
   "dependencies": {
     "@types/js-combinatorics": "^0.5.31",
+    "@types/mathjs": "^6.0.2",
     "@types/node": "^12.12.14",
-    "js-combinatorics": "^0.5.4"
+    "js-combinatorics": "^0.5.4",
+    "mathjs": "^6.2.5"
   }
 }
