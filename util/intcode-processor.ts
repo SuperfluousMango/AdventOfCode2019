@@ -3,7 +3,7 @@ export class IntcodeProcessor {
     private instructionPtr = 0;
     private relativeBase = 0;
 
-    inputVal: number | null = null;
+    inputBuffer: number[] | null = [];
     outputVal: number | null = null;
     outputHandler: (output: number) => void;
 
@@ -17,7 +17,7 @@ export class IntcodeProcessor {
     resetProgram() {
         this.program = [...this.origProgram];
         this.instructionPtr = 0;
-        this.inputVal = null;
+        this.inputBuffer = [];
         this.outputVal = null;
         return this;
     }
@@ -48,13 +48,13 @@ export class IntcodeProcessor {
                     this.writeValToPos(newVal, op.params[2]);
                     break;
                 case OpCode.IN:
-                    if (this.inputVal === null) {
+                    if (this.inputBuffer.length === 0) {
                         if (this.debugMode) { console.log(`WRI input is null at pos ${this.instructionPtr}, pausing`); }
                         // Input is not set, so stop the program here until they set an input and try again
                         return;
                     }
-                    this.writeValToPos(this.inputVal, op.params[0]);
-                    this.inputVal = null;
+                    this.writeValToPos(this.inputBuffer.shift(), op.params[0]);
+                    this.inputBuffer = null;
                     break;
                 case OpCode.OUT:
                     if (this.debugMode) { console.log('OUT param val', this.getParamValue(op.params[0])); }

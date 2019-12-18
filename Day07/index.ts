@@ -24,9 +24,9 @@ function puzzleA() {
             processor.resetProgram();
 
             try {
-                processor.inputVal = phase;
+                processor.inputBuffer.push(phase);
                 processor.runProgram();
-                processor.inputVal = lastOutput;
+                processor.inputBuffer.push(lastOutput);
                 processor.runProgram();
                 if (processor.outputVal === null) {
                     throw new Error(`Unexpected null output`);
@@ -67,11 +67,11 @@ function puzzleB() {
         permutationCount++;
 
         processors.forEach(p => p.resetProgram());
-        curPhaseList.forEach((phase, idx) => processors[idx].inputVal = phase); // set phases
+        curPhaseList.forEach((phase, idx) => processors[idx].inputBuffer.push(phase)); // set phases
 
         // Run all amplifiers enough to process initial (phase) input
         processors.forEach(p => p.runProgram());
-        processors[0].inputVal = 0; // from instructions
+        processors[0].inputBuffer.push(0); // from instructions
 
         while (!(halted && index === 0)) {
             try {
@@ -85,7 +85,7 @@ function puzzleB() {
                 }
 
                 if (outVal !== null) {
-                    processors[index].inputVal = outVal;
+                    processors[index].inputBuffer.push(outVal);
                 }
             } catch (e) {
                 throw new Error(`${permutationCount} permutations, curPhaseList ${curPhaseList}, index ${index}\n${e.message}`);

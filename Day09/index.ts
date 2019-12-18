@@ -9,7 +9,7 @@ function puzzleA() {
         processor = new IntcodeProcessor(program),
         output: number[] = [];
 
-    processor.inputVal = 1; // from instructions
+    processor.inputBuffer.push(1); // from instructions
     processor.outputHandler = (val) => output.push(val);
 
     processor.runProgram();
@@ -21,7 +21,7 @@ function puzzleB() {
         processor = new IntcodeProcessor(program),
         output: number[] = [];
 
-    processor.inputVal = 2; // from instructions
+    processor.inputBuffer.push(2); // from instructions
     processor.outputHandler = (val) => output.push(val);
 
     processor.runProgram();

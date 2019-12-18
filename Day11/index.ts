@@ -9,7 +9,7 @@ function puzzleA() {
     const program = splitInput(inputData),
         processor = new IntcodeProcessor(program);
 
-    processor.inputVal = 0; // All of the panels are currently black
+    processor.inputBuffer.push(0); // All of the panels are currently black
     const paintCoords = paintHull(processor);
 
     return paintCoords.size;
@@ -19,7 +19,7 @@ function puzzleB() {
     const program = splitInput(inputData),
         processor = new IntcodeProcessor(program);
 
-    processor.inputVal = 1; // Start it on a single white square
+    processor.inputBuffer.push(1); // Start it on a single white square
     const paintCoords = paintHull(processor);
 
     // experimentation showed my input, at least, doesn't generate any negative numbers, so no need to offset those
@@ -72,7 +72,7 @@ function paintHull(processor: IntcodeProcessor) {
             curDir = outputVals.shift() === 0 ? rotateLeft(curDir) : rotateRight(curDir);
             [x, y] = moveForward(x, y, curDir);
             let newInput = paintCoords.get(`${x},${y}`);
-            processor.inputVal = newInput === undefined ? 0 : newInput;
+            processor.inputBuffer = newInput === undefined ? 0 : newInput;
         } else {
             halted = true;
         }

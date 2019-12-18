@@ -61,7 +61,7 @@ function puzzleB() {
 
         // Updated the game board; see if the game is over
         if (result === undefined) {
-            processor.inputVal = Math.sign(paddleX - ballX);
+            processor.inputBuffer.push(Math.sign(paddleX - ballX));
         } else {
             halted = true;
         }

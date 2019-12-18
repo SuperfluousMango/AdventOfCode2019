@@ -8,7 +8,7 @@ function puzzleA() {
     const program = splitInput(inputData);
 
     const processor = new IntcodeProcessor(program);
-    processor.inputVal = 1; // specified by instructions
+    processor.inputBuffer.push(1); // specified by instructions
     processor.runProgram();
     return processor.outputVal;
 }
@@ -17,7 +17,7 @@ function puzzleB() {
     const program = splitInput(inputData);
 
     const processor = new IntcodeProcessor(program);
-    processor.inputVal = 5; // specified by instructions
+    processor.inputBuffer.push(5); // specified by instructions
     processor.runProgram();
     return processor.outputVal;
 }
