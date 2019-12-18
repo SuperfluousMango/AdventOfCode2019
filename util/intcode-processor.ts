@@ -3,7 +3,7 @@ export class IntcodeProcessor {
     private instructionPtr = 0;
     private relativeBase = 0;
 
-    inputBuffer: number[] | null = [];
+    inputBuffer: number[] = [];
     outputVal: number | null = null;
     outputHandler: (output: number) => void;
 
@@ -54,7 +54,6 @@ export class IntcodeProcessor {
                         return;
                     }
                     this.writeValToPos(this.inputBuffer.shift(), op.params[0]);
-                    this.inputBuffer = null;
                     break;
                 case OpCode.OUT:
                     if (this.debugMode) { console.log('OUT param val', this.getParamValue(op.params[0])); }
