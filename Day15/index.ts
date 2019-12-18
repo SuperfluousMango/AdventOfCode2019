@@ -106,7 +106,7 @@ function buildMap(processor: IntcodeProcessor) {
                 });
 
             if (newTile) {
-                processor.inputVal = getDirection(curTile, newTile);
+                processor.inputBuffer.push(getDirection(curTile, newTile));
                 processor.runProgram();
                 map.set(newTile.toString(), processor.outputVal);
                 tilesToExplore.delete(newTile.toString());
@@ -123,7 +123,7 @@ function buildMap(processor: IntcodeProcessor) {
             }
         } else {
             const newTile = path.pop();
-            processor.inputVal = getDirection(curTile, newTile);
+            processor.inputBuffer = getDirection(curTile, newTile);
             processor.runProgram();
             // Ignore output because we're backtracking, so we already know what's there.
             x = newTile.x;

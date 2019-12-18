@@ -7,7 +7,6 @@ console.log(`Puzzle B solution: ${puzzleB()}`);
 
 function puzzleA() {
     let input = inputData.split('')
-        // let input = '69317163492948606335995924319873'.split('')
         .map(x => Number(x)),
         output: number[] = [],
         phase: number;
